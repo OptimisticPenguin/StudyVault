@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Index
+{% endblock %}
+
+{% block main %}
+    <div id="pdf-viewer">
+        <iframe id="pdf-frame" src="{{ url_for('static', filename='pdfs/' + title + '.pdf') }}" width="100%" height="600px"></iframe>
+    </div>
+{% endblock %}

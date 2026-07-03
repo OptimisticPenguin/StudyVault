@@ -1,0 +1,183 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    PDF Viewer
+{% endblock %}
+
+{% block main %}
+
+    <div class="mb-auto w-auto mb-3">
+
+
+        <h1 class="title merriweather">{{ title }}</h1>
+        <div class="mb-0" style="text-align: right;">
+            <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#exampleModal">Delete PDF</button>
+            <!-- html from bootstrap -->
+            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h1 class="modal-title fs-5 nunito" id="exampleModalLabel">Confirm Deletion</h1>
+                      <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body nunito" align="left">
+                      Are you sure you want to delete this PDF from the database? This will make it so nobody will be able to access this PDF on this website.
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                      <button type="button" class="btn btn-primary" onclick="delete_pdf('{{ file_path }}')">Confirm</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+        </div>
+        <h2 class="class">{{ class_name }}</h2>
+        <embed id="pdf-frame" src="/{{ file_path }}" type="application/pdf" width="100%" height="1000px">
+
+        <div class="flex">
+            <button type="button" id="quiz-generator" onclick="generatequiz()">
+                <span>Generate Quiz</span>
+            </button>
+        </div>
+    </div>
+
+        <!--UIVERSE loading icon-->
+        <div class="d-flex justify-content-center flex margintop">
+            <div class="flex" id="loading-icon" style="display: none;">
+                <div class="boxes">
+                    <div class="box">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                    <div class="box">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                    <div class="box">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                    <div class="box">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                </div>
+                    </div>
+            </div>
+
+    <div id="quiz-section" class="mt-4 roboto">
+        <div id="quiz-questions"></div>
+    </div>
+
+    <!--AJAX that both the CS50 duck and GPT helped me learn and understand-->
+    <script>
+      function generatequiz() {
+          const filePath = "{{ file_path }}";  // pass file path to the backend
+          const loadingIcon = document.getElementById('loading-icon'); // get the loading icon element
+
+          loadingIcon.style.display = 'block';
+
+          // AJAX request to generate the quiz
+          fetch('/generate_quiz', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ file_path: filePath })
+          })
+          .then(response => response.json())
+          .then(data => {
+              const quizSection = document.getElementById('quiz-questions');
+              loadingIcon.style.display = 'none'; // Hide the loading icon
+              quizSection.innerHTML = '';
+
+              let questions = data.questions;
+              if (typeof questions === 'string') {
+                  questions = questions.split('\n'); // assuming each question is on a new line
+              }
+
+              let groupedQuestions = [];
+              let currentQuestion = null;
+              if (questions) {
+                  questions.forEach((line) => {
+                      if (/^\d+\./.test(line)) { // check if the line starts with a number followed by a dot
+                          currentQuestion = { question: line, options: [] };
+                          groupedQuestions.push(currentQuestion);
+                      } else if (currentQuestion) {
+                          currentQuestion.options.push(line);
+                      }
+                  });
+
+              } else {
+                  loadingIcon.style.display = 'none'; // Hide the loading icon
+                  alert("The document is too long. Please provide a document with fewer than 5000 words.");
+              }
+
+
+              groupedQuestions.forEach((q, index) => {
+                  const questionDiv = document.createElement('div');
+                  questionDiv.innerHTML = `<p>${q.question}</p>`;
+                  q.options.forEach(option => {
+                      const optionDiv = document.createElement('div');
+                      optionDiv.innerHTML = `<p>${option}</p>`;
+                      questionDiv.appendChild(optionDiv);
+                  });
+
+                  // Add extra space between questions (i actually don't think this works because it interprets each line as a question right now)
+                  questionDiv.style.marginTop = '25px';
+                  questionDiv.style.marginBottom = '25px';
+
+                  quizSection.appendChild(questionDiv);
+              });
+          })
+          .catch(error => {
+              alert("Error: " + error.message);
+          });
+      }
+
+
+
+    function delete_pdf(file_path){
+        const filePath = "{{ file_path }}";  // pass file path to the backend
+        fetch('/delete_pdf', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ file_path: file_path }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('PDF deleted successfully.');
+                window.location.href = '/'; // reload to update the list of PDFs
+            } else {
+                alert('Error deleting PDF: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting PDF:', error);
+            alert('An error occurred. Please try again later.');
+        });
+    }
+
+  </script>
+
+{% endblock %}
+
+<!-- the script:
+function generate_quiz(selected pdf text);
+    const filePath = "{{ file_path }}";  // Pass file path to the backend
+
+function delete_pdf(selected_pdf_route);
+
+
+

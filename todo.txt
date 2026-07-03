@@ -1,0 +1,36 @@
+TODO:
+Create login system
+implement upload system
+create homepage or (/) where all the documents will be stored
+implement search system, multiple choice search and text box search
+pdf deletion system
+
+implement dynamic quiz generation
+and a relevence checker
+
+fix later:
+css on upload page
+instead of redirecting to a new page, have some apologies just show up on the page of upload
+Ensure that the selected_class_id and title are properly validated before proceeding.
+
+convert doc/docx to pdf
+reverse the order of documents on homepage OR implement sort system by latest/oldest
+
+make it so the title and subject of the pdf is shown on the pdf_view page
+
+manoj's suggestions:
+history of quizzes taken with logging your past scores
+emojis of subjects around the select class button
+quiz generated off highlighted text
+change number of questions generated
+change color of UI to color associated with subject
+put the search bar in the navbar
+center the study guide database
+thinker emoji
+
+hearting and saving notes in a new location
+
+FINAL TODO:
+animation when hover over a note
+move pagination bar to bottom while centered
+fonts!

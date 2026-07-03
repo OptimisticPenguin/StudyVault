@@ -1,0 +1,62 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Upload a Document
+{% endblock %}
+
+{% block main %}
+    <div data-bs-theme="dark">
+        <form action="/upload" method="post" enctype="multipart/form-data" data-bs-theme="dark">
+            <div class="mb-3" data-bs-theme="dark">
+                <input autocomplete="off" autofocus class="form-control mx-auto w-auto nunito" name="title" placeholder="Title" type="text">
+            </div data-bs-theme="dark">
+            <div class="dropdown mx-auto mb-3 w-auto" data-bs-theme="dark">
+                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Select a class
+                </button>
+                <ul class="dropdown-menu">
+                    {% for class in classes %}
+                        <li><a class="dropdown-item" href="#" onclick="selectClass('{{ class.id }}', '{{ class.class_name }}')">{{ class.class_name }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div data-bs-theme="dark">
+            <input type="hidden" name="selected_class" id="selected_class">
+            <div class="mb-3 nunito">
+                <label for="myfile">Select a file:</label>
+                <input autocomplete="off" class="form-control mx-auto w-auto" type="file" id="myfile" name="myfile">
+                </div>
+            <div class="mb-3 d-flex justify-content-center">
+                <button type="submit">
+                    <span class="text">Upload!</span>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            window.selectClass = function(classId, className) {
+                document.getElementById('selected_class').value = classId;
+                // provides class name on drop down
+                document.querySelector('.dropdown-toggle').textContent = className;
+                console.log("Selected class ID:", classId);
+            };
+        });
+    </script>
+
+{% endblock %}
+
+
+<!-- this part didn't really work idk why -->
+<!--        function selectClass(classId, className) {
+            const selectedClassElement = document.getElementById('selected_class');
+            if (selectedClassElement) {
+                selectedClassElement.value = classId;
+                // Update dropdown button text
+                document.querySelector('.dropdown-toggle').textContent = className;
+                console.log("Selected class ID:", classId);
+            } else {
+            console.error('Element with ID "selected_class" not found.');
+            }
+        }
+        -->

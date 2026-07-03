@@ -1,0 +1,116 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Index
+{% endblock %}
+
+{% block main %}
+
+    <div class="container container2">
+        <div class="row align-items-center mb-3">
+            <!-- Dropdown Bar -->
+            <div class="col-auto">
+                <form method="get" action="/" class="mb-0">
+                    <div class="dropdown">
+                        <button class="btn btn-primary dropdown-toggle nunito" type="button" id="classDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <!-- jinja from duck and GPT for filter buton -->
+                            {% if selected_class %}
+                                {{ classes | selectattr('id', 'equalto', selected_class) | map(attribute='class_name') | first }}
+                            {% else %}
+                                Filter by Class
+                            {% endif %}
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="classDropdown">
+                            <li>
+                                <a class="dropdown-item" href="#" onclick="selectClass('', 'Filter by Class')">All Classes</a>
+                            </li>
+                            {% for class in classes %}
+                                <li>
+                                    <a class="dropdown-item" href="#" onclick="selectClass('{{ class.id }}', '{{ class.class_name }}')">
+                                        {{ class.class_name }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <!-- hidden inputs (in order to reset page to 0 as well once you select a class)-->
+                    <input type="hidden" name="class_id" id="selected_class">
+                    <input type="hidden" name="page" value="1">
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <!-- diplay stuff google docs style-->
+     <div class="mx-auto w-auto mb-3 notes">
+        {% for note in notes %}
+        <div class="note hover-animation" data-file-path="{{ note.file_path }}" onclick="showPDF(this)">
+            <img class="thumbnail" src="{{ note.thumbnail_path }}" alt="PDF Image">
+            <h3 class="very-mini-margin-top">{{ note.class_name }}</h3>
+            <h2 class="text-enlarge">{{ note.title }}</h2>
+            <h3 class="text-shrink">@{{ note.username }}</h3>
+        </div>
+        {% endfor %}
+     </div>
+
+
+    <!-- Pagination Bar -->
+    <div class="center mini-margin-top">
+        <nav>
+            <ul class="pagination justify-content-center mb-0">
+                <!-- Previous Button -->
+                <li class="page-item {% if page == 1 %}disabled{% endif %}">
+                    <a class="page-link" href="/?page={{ page - 1 }}{% if selected_class %}&class_id={{ selected_class }}{% endif %}">Previous</a>
+                </li>
+
+                <!-- Page Numbers -->
+                {% for p in range(1, total_pages + 1) %}
+                    <li class="page-item {% if page == p %}active{% endif %}">
+                        <a class="page-link" href="/?page={{ p }}{% if selected_class %}&class_id={{ selected_class }}{% endif %}">{{ p }}</a>
+                    </li>
+                {% endfor %}
+
+                <!-- Next Button -->
+                <li class="page-item {% if page == total_pages %}disabled{% endif %}">
+                    <a class="page-link" href="/?page={{ page + 1 }}{% if selected_class %}&class_id={{ selected_class }}{% endif %}">Next</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- jinja in order to say how many pdfs are being displayed, out of how many total pdfs -->
+    <h2 class="mini-margin-top">Displaying {{ start + 1 }}-{{ end if end <= note_count else note_count }} of {{ note_count }} study guides</h2>
+
+
+    <script>
+    function showPDF(element) {
+        const filePath = element.getAttribute('data-file-path');
+        window.location.href = '/pdf/' + filePath;
+    }
+
+    function nextpage() {
+        document.querySelectorAll('.page-link').forEach(link => {
+            link.addEventListener('click', function(event) {
+            event.preventDefault();
+            const page = this.textContent.trim();
+            console.log();
+        });
+    });
+    }
+
+    function selectClass(classId, className) {
+        // update the hidden input with the selected class ID
+        document.getElementById('selected_class').value = classId;
+
+        // update the dropdown button's text
+        document.getElementById('classDropdown').textContent = className;
+
+        // submits form
+        document.querySelector('form').submit();
+    }
+
+    </script>
+{% endblock %}
