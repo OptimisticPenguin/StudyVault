@@ -7,7 +7,7 @@ import time
 import PyPDF2
 import openai
 
-openai.api_key = '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'
+openai.api_key = ''
 
 
 ALLOWED_EXTENSIONS = {'pdf', 'doc', 'docx'}
